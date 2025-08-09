@@ -34,6 +34,17 @@ const courtSchema = new mongoose.Schema({
     type: String,
     required: true,
   },
+  coordinates: {
+    type: {
+      type: String,
+      enum: ['Point'],
+      default: 'Point'
+    },
+    coordinates: {
+      type: [Number], // [longitude, latitude]
+      index: '2dsphere'
+    }
+  },
   pricePerHour: {
     type: Number,
     required: [true, 'Please provide a price per hour'],
