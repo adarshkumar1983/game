@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import BookingForm from '../../components/BookingForm';
 import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 
@@ -22,7 +23,7 @@ interface Court {
   owner: Owner;
   coordinates?: {
     type: string;
-    coordinates: [number, number]; // [longitude, latitude]
+    coordinates: [number, number]; 
   };
   createdAt: string;
   updatedAt: string;
@@ -50,15 +51,22 @@ export default function CourtDetailPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState<'details' | 'bookings' | 'location'>('details');
+  const [showBookingForm, setShowBookingForm] = useState(false);
 
   // Fetch court details
   const fetchCourtDetails = async () => {
     try {
       setLoading(true);
-      const response = await fetch(`http://localhost:5000/api/courts/${courtId}`);
-      const data = await response.json();
+  const response = await fetch(`http://localhost:5001/api/courts/${courtId}`);
+      let data = null;
+      if (response.ok) {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : null;
+      } else {
+        data = null;
+      }
 
-      if (data.success) {
+      if (data && data.success) {
         setCourt(data.data);
       } else {
         setError('Court not found');
@@ -74,10 +82,16 @@ export default function CourtDetailPage() {
   // Fetch court bookings (if you have this endpoint)
   const fetchCourtBookings = async () => {
     try {
-      const response = await fetch(`http://localhost:5000/api/bookings?court=${courtId}`);
-      const data = await response.json();
+  const response = await fetch(`http://localhost:5001/api/bookings?court=${courtId}`);
+      let data = null;
+      if (response.ok) {
+        const text = await response.text();
+        data = text ? JSON.parse(text) : null;
+      } else {
+        data = null;
+      }
 
-      if (data.success) {
+      if (data && data.success) {
         setBookings(data.data || []);
       }
     } catch (err) {
@@ -353,12 +367,12 @@ export default function CourtDetailPage() {
                 <div className="flex items-center gap-3">
                   <div className="w-12 h-12 bg-blue-100 rounded-full flex items-center justify-center">
                     <span className="text-blue-600 font-semibold text-lg">
-                      {court.owner.name.charAt(0).toUpperCase()}
+                      {court?.owner?.name ? court.owner.name.charAt(0).toUpperCase() : ''}
                     </span>
                   </div>
                   <div>
-                    <div className="font-medium text-gray-900">{court.owner.name}</div>
-                    <div className="text-sm text-gray-600">{court.owner.email}</div>
+                    <div className="font-medium text-gray-900">{court?.owner?.name || ''}</div>
+                    <div className="text-sm text-gray-600">{court?.owner?.email || ''}</div>
                   </div>
                 </div>
                 
@@ -378,9 +392,26 @@ export default function CourtDetailPage() {
                   ₹{court.pricePerHour}
                 </div>
                 <div className="text-gray-600 mb-4">per hour</div>
-                <button className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium">
+                <button
+                  className="w-full bg-blue-600 text-white py-3 px-4 rounded-lg hover:bg-blue-700 transition-colors font-medium"
+                  onClick={() => setShowBookingForm(true)}
+                >
                   📅 Book Now
                 </button>
+                {showBookingForm && (
+                  <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-md w-full relative">
+                      <button
+                        className="absolute top-2 right-2 text-gray-500 hover:text-gray-700 text-2xl"
+                        onClick={() => setShowBookingForm(false)}
+                        aria-label="Close"
+                      >
+                        &times;
+                      </button>
+                      <BookingForm court={court} />
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
 

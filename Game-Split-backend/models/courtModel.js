@@ -41,7 +41,7 @@ const courtSchema = new mongoose.Schema({
       default: 'Point'
     },
     coordinates: {
-      type: [Number], // [longitude, latitude]
+      type: [Number], 
       index: '2dsphere'
     }
   },

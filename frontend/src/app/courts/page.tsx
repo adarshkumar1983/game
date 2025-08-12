@@ -46,10 +46,17 @@ export default function CourtsPage() {
   });
   const [userLocation, setUserLocation] = useState<{lat: number, lng: number} | null>(null);
 
-  // Sports options
+  // Sports options with icons
   const sports = [
-    'Badminton', 'Football', 'Cricket', '8 Ball Pool', 'Snooker', 
-    'Tennis', 'Basketball', 'Futsal', 'Volleyball'
+    { name: 'Badminton', icon: '🏸' },
+    { name: 'Football', icon: '⚽' },
+    { name: 'Cricket', icon: '🏏' },
+    { name: '8 Ball Pool', icon: '🎱' },
+    { name: 'Snooker', icon: '🎯' },
+    { name: 'Tennis', icon: '🎾' },
+    { name: 'Basketball', icon: '🏀' },
+    { name: 'Futsal', icon: '⚽' },
+    { name: 'Volleyball', icon: '🏐' },
   ];
 
   // Fetch courts from API
@@ -210,6 +217,25 @@ export default function CourtsPage() {
         </div>
       </div>
 
+      {/* Sport Category Selector */}
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-4">
+        <div className="overflow-x-auto pb-2">
+          <div className="flex gap-3 min-w-max">
+            {sports.map((sport) => (
+              <button
+                key={sport.name}
+                onClick={() => handleFilterChange('sport', filters.sport === sport.name ? '' : sport.name)}
+                className={`flex flex-col items-center px-4 py-2 rounded-lg border transition-colors whitespace-nowrap
+                  ${filters.sport === sport.name ? 'bg-blue-600 text-white border-blue-600 shadow' : 'bg-white text-gray-700 border-gray-300 hover:bg-blue-50'}`}
+              >
+                <span className="text-2xl mb-1">{sport.icon}</span>
+                <span className="text-xs font-medium">{sport.name}</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         {/* Filters */}
         <div className="bg-white rounded-lg shadow-sm p-6 mb-8">
@@ -242,7 +268,7 @@ export default function CourtsPage() {
               >
                 <option value="">All Sports</option>
                 {sports.map(sport => (
-                  <option key={sport} value={sport}>{sport}</option>
+                  <option key={sport.name} value={sport.name}>{sport.name}</option>
                 ))}
               </select>
             </div>
